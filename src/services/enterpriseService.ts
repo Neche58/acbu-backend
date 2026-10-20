@@ -160,6 +160,7 @@ async function processRow(
     const transaction = await prisma.transaction.create({
       data: {
         userId: senderUserId,
+        organizationId,
         type: "transfer",
         status: "completed",
         recipientAddress: row.to,
