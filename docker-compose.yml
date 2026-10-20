@@ -1,3 +1,11 @@
+# =============================================================================
+# LOCAL DEVELOPMENT ONLY
+# This file is intended exclusively for local development environments.
+# Do NOT use this configuration in staging, production, or any shared
+# environment. Secrets must be provided via a local .env file — there are
+# no default fallback passwords.
+# =============================================================================
+
 version: '3.8'
 
 services:
@@ -7,10 +15,10 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-acbu}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-acbu_password}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD environment variable is required}
       POSTGRES_DB: ${POSTGRES_DB:-acbu_db}
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -25,10 +33,10 @@ services:
     restart: unless-stopped
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER:-acbu}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-acbu_password}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:?MONGO_PASSWORD environment variable is required}
       MONGO_INITDB_DATABASE: ${MONGO_DB:-acbu_cache}
     ports:
-      - "27017:27017"
+      - "127.0.0.1:27017:27017"
     volumes:
       - mongodb_data:/data/db
     healthcheck:
@@ -43,10 +51,10 @@ services:
     restart: unless-stopped
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-acbu}
-      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-acbu_password}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:?RABBITMQ_PASSWORD environment variable is required}
     ports:
-      - "5672:5672"   # AMQP port
-      - "15672:15672" # Management UI
+      - "127.0.0.1:5672:5672"   # AMQP port
+      - "127.0.0.1:15672:15672" # Management UI
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     healthcheck:
