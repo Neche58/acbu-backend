@@ -173,8 +173,8 @@ export async function getSalarySchedules(
     const schedules = await salaryService.getSalarySchedules({
       userId: userId || undefined,
       organizationId: organizationId || undefined,
-      limit,
-      offset,
+      limit: parseInt(req.query.limit as string) || 50,
+      offset: parseInt(req.query.offset as string) || 0,
     });
 
     res.status(200).json({
