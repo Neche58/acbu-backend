@@ -148,6 +148,10 @@ backend/
 
 ## API Documentation
 
+For the proposed alignment of partner reconciliation, attestation, and audit
+requirements (W10-DOC-016), see [Partner audit cadence proposal](docs/PARTNER_AUDIT_CADENCE.md).
+The proposal includes source-document integration steps pending maintainer review.
+
 Once the server is running, API documentation is available at:
 - Swagger UI: `http://localhost:5000/api-docs` (development only, disabled in production for security)
 
