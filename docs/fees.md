@@ -257,6 +257,30 @@ if (targetWeight <= 0) {
 
 **Impact**: System now fails explicitly when encountering invalid states, preventing incorrect fee calculations.
 
+### 4. KYC Application Fee
+
+A one-time, non-refundable fee is charged when a user submits a KYC application.
+
+| Fee | Amount | Currency | Refundable |
+|-----|--------|----------|-----------|
+| KYC application submission | 1 | ACBU | No |
+
+The fee is deducted from the user's ACBU wallet balance at the moment the application is
+submitted. It applies to all tiers (Tier 1, 2, and 3 applications). Re-submission after
+rejection also incurs the full 1 ACBU fee.
+
+**Revenue routing:** KYC application fees flow into the validator reward pool. They do
+not contribute to protocol revenue or the treasury reserve.
+
+#### Code Reference
+
+```typescript
+// Location: docs/KYC_LAYER.md — configuration table
+feeAcbu = 1   // 1 ACBU per application (governance-adjustable from Year 3)
+```
+
+---
+
 ## Maintenance
 
 When updating fee tiers:
