@@ -9,6 +9,7 @@ import { getInitialDailyMidnight, getNextDailyMidnight } from "../../utils/dateU
 import { retryWithBackoff } from "../../utils/retry";
 import crypto from "crypto";
 import { decimalToNumber } from "../../utils/decimalUtils";
+import { DEFAULT_PAGE_LIMIT } from "../../utils/pagination";
 
 /**
  * Creates a new salary batch with items. Supports idempotency via idempotencyKey.
@@ -235,7 +236,7 @@ export async function getSalaryBatches(params: {
   limit?: number;
   offset?: number;
 }) {
-  const { organizationId, userId, limit = 20, offset = 0 } = params;
+  const { organizationId, userId, limit = DEFAULT_PAGE_LIMIT, offset = 0 } = params;
 
   return prisma.salaryBatch.findMany({
     where: {
@@ -351,8 +352,13 @@ export async function createSalarySchedule(params: {
 /**
  * Lists salary schedules for an organization or user.
  */
-export async function getSalarySchedules(params: { organizationId?: string; userId?: string }) {
-  const { organizationId, userId } = params;
+export async function getSalarySchedules(params: {
+  organizationId?: string;
+  userId?: string;
+  limit?: number;
+  offset?: number;
+}) {
+  const { organizationId, userId, limit = DEFAULT_PAGE_LIMIT, offset = 0 } = params;
 
   return prisma.salarySchedule.findMany({
     where: {
@@ -361,5 +367,7 @@ export async function getSalarySchedules(params: { organizationId?: string; user
       ),
     },
     orderBy: { createdAt: "desc" },
+    take: limit,
+    skip: offset,
   });
 }
