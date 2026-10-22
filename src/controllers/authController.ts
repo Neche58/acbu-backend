@@ -17,7 +17,11 @@ import { prisma } from "../config/database";
 import { AppError } from "../middleware/errorHandler";
 
 export const signinSchema = z.object({
-  identifier: z.string().min(1, "identifier is required"),
+  // 320 chars is the RFC 5321 maximum length for an e-mail address; also covers
+  // usernames and phone numbers with plenty of headroom.  Without an upper bound
+  // oversized identifiers pass through normalization and logging unchecked,
+  // creating a minor DoS / log-noise surface (W10-BE-011).
+  identifier: z.string().min(1, "identifier is required").max(320, "identifier must be 320 characters or fewer"),
   passcode: z.string().min(1, "passcode is required"),
   captcha_token: z.string().optional(),
   issue_refresh_token: z.boolean().optional(),
