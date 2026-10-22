@@ -164,14 +164,41 @@ export async function sendSms(to: string, body: string): Promise<void> {
     }
     return;
   }
-  if (
-    cfg.smsProvider === "africas_talking" &&
-    cfg.africasTalkingApiKey &&
-    cfg.africasTalkingUsername
-  ) {
-    logger.warn("AfricasTalking provider not implemented; logging only", {
-      to: to ? "***" : undefined,
-    });
+  if (cfg.smsProvider === "africas_talking") {
+    if (!cfg.africasTalkingApiKey || !cfg.africasTalkingUsername) {
+      // Fail closed: provider is selected but credentials are absent.
+      // This is a configuration error — throw so the caller (and any retry /
+      // DLQ mechanism) learns the message was NOT delivered, rather than
+      // silently dropping it.
+      const err = new Error(
+        "AfricasTalking SMS provider is selected (NOTIFICATION_SMS_PROVIDER=africas_talking) " +
+          "but AFRICAS_TALKING_API_KEY or AFRICAS_TALKING_USERNAME is not set. " +
+          "Set both credentials or switch to a different provider.",
+      );
+      logger.error("AfricasTalking misconfiguration: missing credentials", { error: err });
+      throw err;
+    }
+    try {
+      await axios.post(
+        "https://api.africastalking.com/version1/messaging",
+        new URLSearchParams({
+          username: cfg.africasTalkingUsername,
+          to,
+          message: body,
+        }),
+        {
+          headers: {
+            apiKey: cfg.africasTalkingApiKey,
+            Accept: "application/json",
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+        },
+      );
+      logger.info("SMS sent via AfricasTalking", { to: to ? "***" : undefined });
+    } catch (e) {
+      logger.error("AfricasTalking send failed", { error: e });
+      throw e;
+    }
     return;
   }
   logger.info("NotificationService (SMS log)", { to: to ? "***" : undefined });
